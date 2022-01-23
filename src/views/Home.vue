@@ -12,7 +12,14 @@
 
       <div class="d-flex align-items-center">
         <small class="me-2">Filter by type:</small>
-        <Filter v-if="pokemons.length === 100" :pokemons="pokemons" />
+        <Filter />
+        <button
+          class="btn btn-light btn-sm ms-2 rounded-3"
+          v-if="filterStatus"
+          @click="clearFilter"
+        >
+          Clear filter
+        </button>
       </div>
     </header>
 
@@ -49,20 +56,24 @@ export default {
   setup() {
     const store = useStore();
 
-    // const pokemons = computed(() => store.getters.orderPokemonsById);
-    const pokemons = computed(() => store.getters.pokemonsByType(null));
+    const pokemons = computed(() => store.getters.orderPokemonsById);
     const isLoading = computed(() => store.state.isLoading);
+    const filterStatus = computed(() => store.state.filterStatus);
+
+    const clearFilter = () => {
+      store.dispatch('fetchPokemons');
+      store.commit('setFilterStatus', false);
+    };
 
     onMounted(() => {
-      // Get first 100 pokemons by id
-      for (let id = 1; id <= 100; id++) {
-        store.dispatch('fetchPokemon', id);
-      }
+      store.dispatch('fetchPokemons');
     });
 
     return {
       pokemons,
       isLoading,
+      filterStatus,
+      clearFilter,
     };
   },
 };

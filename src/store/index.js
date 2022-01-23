@@ -15,27 +15,25 @@ export default createStore({
         (firstEl, secondEl) => firstEl.id - secondEl.id
       );
     },
-    pokemonsByType: state => type => {
-      if (!type) {
-        return state.pokemons;
-      }
-
-      return state.pokemons.filter(pokemon =>
-        pokemon.types.forEach(el => el.type.name === type)
-      );
-    },
   },
 
   actions: {
-    async fetchPokemon({ commit }, id) {
+    async fetchPokemons({ commit }) {
       commit('setLoading', true);
-      const res = await axios.get(
-        `${process.env.VUE_APP_API_BASE_URL}/pokemon/${id}`
-      );
-      if (res.status === 200) {
-        commit('setLoading', false);
-        commit('pushPokemon', res.data);
+
+      const pokemons = [];
+
+      // Fetch all 100 pokemon data
+      for (let id = 1; id <= 100; id++) {
+        const res = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}/pokemon/${id}`
+        );
+
+        pokemons.push(res.data);
       }
+
+      commit('setLoading', false);
+      commit('setPokemons', pokemons);
     },
 
     async fetchSinglePokemon({ commit }, id) {
@@ -49,6 +47,21 @@ export default createStore({
         commit('setPokemon', res.data);
       }
     },
+
+    async filterPokemons({ commit, dispatch, state }, typeName) {
+      commit('setLoading', true);
+
+      // Restore all 100 pokemon data
+      await dispatch('fetchPokemons');
+
+      const filteredPokemons = state.pokemons.filter(pokemon =>
+        pokemon.types.some(el => el.type.name === typeName)
+      );
+
+      commit('setLoading', false);
+      commit('setFilterStatus', true);
+      commit('setPokemons', filteredPokemons);
+    },
   },
 
   mutations: {
@@ -59,11 +72,17 @@ export default createStore({
       }
       state.pokemons.push(pokemon);
     },
+    setPokemons(state, pokemons) {
+      state.pokemons = pokemons;
+    },
     setPokemon(state, pokemon) {
       state.pokemon = pokemon;
     },
     setLoading(state, status) {
       state.isLoading = status;
+    },
+    setFilterStatus(state, status) {
+      state.filterStatus = status;
     },
   },
 });

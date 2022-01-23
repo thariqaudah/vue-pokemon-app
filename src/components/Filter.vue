@@ -9,29 +9,41 @@
 </template>
 
 <script>
-import { inject, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
+import axios from 'axios';
 
 export default {
   name: 'Filter',
-  props: ['pokemons'],
-  setup(props) {
+  setup() {
     const types = ref([]);
     const selectedType = ref('--Select type--');
 
-    const filterByType = inject('filterByType');
-
-    const typeSet = new Set();
+    const store = useStore();
 
     const handleChange = () => {
       if (selectedType.value !== '--Select type--') {
-        // Run filter function
-        filterByType(selectedType.value);
+        // Run filter
+        store.dispatch('filterPokemons', selectedType.value);
       }
     };
 
-    onMounted(() => {
-      props.pokemons.forEach(pokemon => {
-        pokemon.types.forEach(el => typeSet.add(el.type.name));
+    onMounted(async () => {
+      const pokemons = [];
+      // Get first 100 pokemons by id
+      for (let id = 1; id <= 100; id++) {
+        const res = await axios.get(
+          `${process.env.VUE_APP_API_BASE_URL}/pokemon/${id}`
+        );
+        pokemons.push(res.data);
+      }
+
+      const typeSet = new Set();
+
+      pokemons.forEach(pokemon => {
+        pokemon.types.forEach(el => {
+          typeSet.add(el.type.name);
+        });
       });
 
       types.value = ['--Select type--', ...typeSet];
