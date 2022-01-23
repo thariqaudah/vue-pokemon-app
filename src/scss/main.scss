@@ -7,16 +7,16 @@ $body-color: #374151;
 // Font family
 $font-family-sans-serif: 'Poppins', sans-serif;
 
-// Utils
-$box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-
 // Colors
 $primary: #e03131;
+$light: #f1f3f5;
 
 // Cards
 $card-border-width: none;
 $card-border-color: none;
 $card-border-radius: 11px;
-// $card-box-shadow: 0 10px 30px rgba(0, 0, 0, 1) !important;
+
+// Progress bars
+$progress-bg: #dee2e6;
 
 @import '../../node_modules/bootstrap/scss/bootstrap.scss';

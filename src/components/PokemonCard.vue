@@ -1,63 +1,68 @@
 <template>
-	<div class="pokemon-card card shadow p-4">
-		<div class="img-container">
-			<img
-				:src="pokemon.sprites.front_shiny"
-				class="card-img-top pokemon-img"
-				alt="Pokemon image"
-			/>
-		</div>
+  <transition name="fade-card">
+    <div class="pokemon-card card">
+      <div class="img-container bg-light text-center">
+        <img
+          :src="pokemon.sprites.front_shiny"
+          class="card-img-top pokemon-img bg-light w-75"
+          alt="Pokemon image"
+        />
+      </div>
 
-		<div class="card-body mx-auto text-center">
-			<h4 class="card-title mb-5">{{ pokemonName }}</h4>
-			<a href="#" class="btn btn-primary">View details</a>
-		</div>
-	</div>
+      <div class="card-body py-4">
+        <p class="fs-6 fw-normal text-secondary mb-3">#{{ pokemon.id }}</p>
+        <h4 class="card-title" v-if="pokemon">
+          {{ $filters.capitalizeString(pokemon.name) }}
+        </h4>
+        <p class="mb-5">
+          <small class="me-2">Type:</small>
+          <span
+            class="badge bg-dark rounded-3 me-1"
+            v-for="el in pokemon.types"
+            :key="el.type.name"
+          >
+            {{ el.type.name }}
+          </span>
+        </p>
+        <router-link
+          class="btn btn-primary"
+          :to="{ name: 'PokemonDetails', params: { id: pokemon.id } }"
+          >View details</router-link
+        >
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
-import { computed } from 'vue';
-
 export default {
-	name: 'PokemonCard',
-	props: ['pokemon'],
-	setup(props) {
-		const pokemonName = computed(
-			() =>
-				`${props.pokemon.name[0].toUpperCase()}${props.pokemon.name.slice(1)}`
-		);
-
-		return {
-			pokemonName,
-		};
-	},
+  name: 'PokemonCard',
+  props: ['pokemon'],
 };
 </script>
 
 <style lang="scss" scoped>
 .pokemon-card {
-	.img-container {
-		text-align: center;
-		position: relative;
+  transition: all 0.2s ease-in;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
 
-		&::before {
-			content: '';
-			display: block;
-			width: 60%;
-			padding-bottom: 60%;
-			background-color: #fceaea;
-			border-radius: 50%;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-		}
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+}
 
-		.pokemon-img {
-			width: 80%;
-			margin: 0 auto;
-			position: relative;
-		}
-	}
+.fade-card {
+  .fade-card-enter-active {
+    transition: all 0.3s ease-in;
+  }
+
+  .fade-card-enter-from {
+    opacity: 0;
+  }
+
+  .fade-card-enter-to {
+    opacity: 1;
+  }
 }
 </style>
